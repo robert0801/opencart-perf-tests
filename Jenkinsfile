@@ -6,7 +6,7 @@ pipeline {
         JM_HOME = "/var/jenkins_home/apache-jmeter-${JM_VERSION}"
         JM_BIN  = "${JM_HOME}/bin/jmeter.sh"
 
-        JMX_FILE = "OpenCart.jmx"
+        JMX_FILE = "Opencart.jmx"
         RESULTS_FILE = "results.jtl"
     }
 
