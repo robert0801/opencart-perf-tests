@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+        parameters {
+            string(name: 'THREADS', defaultValue: '1', description: 'Количество потоков')
+        }
+
     environment {
         JM_VERSION = "5.6.3"
         JM_HOME = "/var/jenkins_home/apache-jmeter-${JM_VERSION}"
@@ -30,7 +34,7 @@ pipeline {
         stage('Run Load Test') {
             steps {
                 echo "--- Starting JMeter Load Test ---"
-                sh "${JM_BIN} -n -t ${JMX_FILE} -l ${RESULTS_FILE}"
+                sh ${JM_BIN} -n -t ${JMX_FILE} -l ${RESULTS_FILE} -Jthreads=${params.THREADS}
             }
         }
 
