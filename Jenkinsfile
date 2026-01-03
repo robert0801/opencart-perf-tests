@@ -34,7 +34,7 @@ pipeline {
         stage('Run Load Test') {
             steps {
                 echo "--- Starting JMeter Load Test ---"
-                sh ${JM_BIN} -n -t ${JMX_FILE} -l ${RESULTS_FILE} -Jthreads=${params.THREADS}
+                sh "${JM_BIN} -n -t ${JMX_FILE} -l ${RESULTS_FILE} -Jthreads=${params.THREADS}"
             }
         }
 
