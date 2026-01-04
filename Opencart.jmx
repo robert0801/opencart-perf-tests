@@ -36,6 +36,11 @@
             <stringProp name="Argument.value">24</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
+          <elementProp name="mode" elementType="Argument">
+            <stringProp name="Argument.name">mode</stringProp>
+            <stringProp name="Argument.value">${__P(mode, guest)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
         </collectionProp>
       </Arguments>
       <hashTree/>
@@ -67,9 +72,11 @@
       </CSVDataSet>
       <hashTree/>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group">
-        <intProp name="ThreadGroup.num_threads">5</intProp>
-        <intProp name="ThreadGroup.ramp_time">0</intProp>
+        <stringProp name="ThreadGroup.num_threads">${__P(threads, 5)}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${__P(rampup, 5)}</stringProp>
+        <stringProp name="ThreadGroup.duration">${__P(duration, 999999)}</stringProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
           <stringProp name="LoopController.loops">${__P(loops, 1)}</stringProp>
@@ -106,10 +113,10 @@
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree/>
-        <IfController guiclass="IfControllerPanel" testclass="IfController" testname="Контроллер для авторизованного пользователя" enabled="true">
-          <stringProp name="IfController.condition">${user_type_rand} &gt; 50</stringProp>
+        <IfController guiclass="IfControllerPanel" testclass="IfController" testname="Контроллер для авторизованного пользователя">
+          <stringProp name="IfController.condition">${__groovy(vars.get(&apos;mode&apos;) == &apos;mix&apos; &amp;&amp; vars.get(&apos;user_type_rand&apos;).toInteger() &gt; 50)}</stringProp>
           <boolProp name="IfController.evaluateAll">false</boolProp>
-          <boolProp name="IfController.useExpression">false</boolProp>
+          <boolProp name="IfController.useExpression">true</boolProp>
         </IfController>
         <hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="1.1. Login" enabled="true">
@@ -150,10 +157,10 @@
             <hashTree/>
           </hashTree>
         </hashTree>
-        <IfController guiclass="IfControllerPanel" testclass="IfController" testname="Контроллер для неавторизованного пользователя" enabled="true">
-          <stringProp name="IfController.condition">${user_type_rand} &lt;= 50</stringProp>
+        <IfController guiclass="IfControllerPanel" testclass="IfController" testname="Контроллер для неавторизованного пользователя">
+          <stringProp name="IfController.condition">${__groovy(vars.get(&apos;mode&apos;) == &apos;guest&apos; || (vars.get(&apos;mode&apos;) == &apos;mix&apos; &amp;&amp; vars.get(&apos;user_type_rand&apos;).toInteger() &lt;= 50))}</stringProp>
           <boolProp name="IfController.evaluateAll">false</boolProp>
-          <boolProp name="IfController.useExpression">false</boolProp>
+          <boolProp name="IfController.useExpression">true</boolProp>
         </IfController>
         <hashTree/>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="2. Open Category Page" enabled="true">
@@ -387,8 +394,8 @@
         </HTTPSamplerProxy>
         <hashTree/>
         <GaussianRandomTimer guiclass="GaussianRandomTimerGui" testclass="GaussianRandomTimer" testname="Gaussian Random Timer" enabled="true">
-          <stringProp name="ConstantTimer.delay">50</stringProp>
-          <stringProp name="RandomTimer.range">10.0</stringProp>
+          <stringProp name="ConstantTimer.delay">2000</stringProp>
+          <stringProp name="RandomTimer.range">200</stringProp>
         </GaussianRandomTimer>
         <hashTree/>
         <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
@@ -401,7 +408,7 @@
           <intProp name="Assertion.test_type">8</intProp>
         </ResponseAssertion>
         <hashTree/>
-        <DebugSampler guiclass="TestBeanGUI" testclass="DebugSampler" testname="Debug Sampler" enabled="true">
+        <DebugSampler guiclass="TestBeanGUI" testclass="DebugSampler" testname="Debug Sampler">
           <boolProp name="displayJMeterProperties">false</boolProp>
           <boolProp name="displayJMeterVariables">true</boolProp>
           <boolProp name="displaySystemProperties">false</boolProp>
@@ -454,7 +461,7 @@
               </elementProp>
               <elementProp name="influxdbUrl" elementType="Argument">
                 <stringProp name="Argument.name">influxdbUrl</stringProp>
-                <stringProp name="Argument.value">http://influxdb:8086/write?db=jmeter</stringProp>
+                <stringProp name="Argument.value">http://localhost:8086/write?db=jmeter</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
               <elementProp name="application" elementType="Argument">

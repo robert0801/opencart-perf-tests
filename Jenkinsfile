@@ -2,8 +2,12 @@ pipeline {
     agent any
 
         parameters {
-            string(name: 'THREADS', defaultValue: '1', description: 'Количество потоков')
-            string(name: 'LOOPS', defaultValue: '1', description: 'Количество циклов')
+            choice(name: 'MODE', choices: ['guest', 'mix'], description: 'Сценарий: только гость или 50/50')
+            choice(name: 'LOAD_TYPE', choices: ['By Duration (по времени)', 'By Loops (по кругам)'], description: 'Как ограничиваем тест?')
+            string(name: 'THREADS', defaultValue: '1', description: 'Количество пользователей')
+            string(name: 'RAMPUP', defaultValue: '1', description: 'Разгон (сек)')
+            string(name: 'DURATION_VAL', defaultValue: '60', description: 'Если выбрали "по времени" (сек)')
+            string(name: 'LOOPS_VAL', defaultValue: '1', description: 'Если выбрали "по кругам" (количество повторов)')
         }
 
     environment {
@@ -34,8 +38,29 @@ pipeline {
 
         stage('Run Load Test') {
             steps {
-                echo "--- Starting JMeter Load Test ---"
-                sh "${JM_BIN} -n -t ${JMX_FILE} -l ${RESULTS_FILE} -Jthreads=${params.THREADS} -Jloops=${params.LOOPS}"
+               def jm_loops = ""
+               def jm_duration = ""
+
+               if (params.LOAD_TYPE.contains('Duration')) {
+                   echo "--- Режим: ТЕСТ ПО ВРЕМЕНИ (${params.DURATION_VAL} сек) ---"
+                   jm_loops = "-1" // Бесконечные циклы
+                   jm_duration = params.DURATION_VAL
+               } else {
+                   echo "--- Режим: ТЕСТ ПО ЦИКЛАМ (${params.LOOPS_VAL} кругов) ---"
+                   jm_loops = params.LOOPS_VAL
+                   jm_duration = "999999" // Бесконечное время
+               }
+
+               // Запуск с вычисленными значениями
+               sh """
+                  ${JM_BIN} -n -t ${JMX_FILE} -l results.jtl \
+                     -Jmode=${params.MODE} \
+                     -Jthreads=${params.THREADS} \
+                     -Jrampup=${params.RAMPUP} \
+                     -Jloops=${jm_loops} \
+                     -Jduration=${jm_duration}
+                  """
+                }
             }
         }
 
