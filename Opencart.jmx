@@ -74,7 +74,7 @@
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group">
         <stringProp name="ThreadGroup.num_threads">${__P(threads, 5)}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">${__P(rampup, 5)}</stringProp>
-        <stringProp name="ThreadGroup.duration">${__P(duration, 99999}</stringProp>
+        <stringProp name="ThreadGroup.duration">${__P(duration, 99999)}</stringProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
@@ -393,7 +393,7 @@
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree/>
-        <GaussianRandomTimer guiclass="GaussianRandomTimerGui" testclass="GaussianRandomTimer" testname="Gaussian Random Timer" enabled="true">
+        <GaussianRandomTimer guiclass="GaussianRandomTimerGui" testclass="GaussianRandomTimer" testname="Gaussian Random Timer">
           <stringProp name="ConstantTimer.delay">2000</stringProp>
           <stringProp name="RandomTimer.range">200</stringProp>
         </GaussianRandomTimer>
