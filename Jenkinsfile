@@ -59,7 +59,8 @@ pipeline {
                         -Jthreads=${params.THREADS} \
                         -Jrampup=${params.RAMPUP} \
                         -Jloops=${jm_loops} \
-                        -Jduration=${jm_duration}
+                        -Jduration=${jm_duration} \
+                        -Jinflux_host=influxdb
                     """
                 }
             }
