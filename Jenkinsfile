@@ -2,9 +2,8 @@ pipeline {
     agent any
 
     parameters {
-        // Выбор сценария
         choice(name: 'TARGET',
-               choices: ['e2e', 'home', 'login', 'entries', 'addtocart', 'viewcart', 'view', 'deleteitem'],
+               choices: ['e2e', 'home', 'entries', 'view', 'addtocart', 'viewcart', 'deleteitem'],
                description: 'Что тестируем? e2e - весь сценарий, остальное - изоляция эндпоинтов')
 
         choice(name: 'MODE', choices: ['guest', 'mix'], description: 'Сценарий: только гость или 50/50')
@@ -47,22 +46,20 @@ pipeline {
                     // Инициализируем потоки всех групп нулями
                     def t_e2e = 0
                     def t_home = 0
-                    def t_login = 0
                     def t_entries = 0
+                    def t_view = 0
                     def t_addtocart = 0
                     def t_viewcart = 0
-                    def t_view = 0
                     def t_deleteitem = 0
 
                     // Присваиваем THREADS только выбранному таргету
                     switch(params.TARGET) {
                         case 'e2e': t_e2e = params.THREADS; break
                         case 'home': t_home = params.THREADS; break
-                        case 'login': t_login = params.THREADS; break
                         case 'entries': t_entries = params.THREADS; break
+                        case 'view': t_view = params.THREADS; break
                         case 'addtocart': t_addtocart = params.THREADS; break
                         case 'viewcart': t_viewcart = params.THREADS; break
-                        case 'view': t_view = params.THREADS; break
                         case 'deleteitem': t_deleteitem = params.THREADS; break
                     }
 
@@ -86,11 +83,10 @@ pipeline {
                         ${JM_BIN} -n -t ${JMX_FILE} -l ${RESULTS_FILE} \
                         -Jt_e2e=${t_e2e} \
                         -Jt_home=${t_home} \
-                        -Jt_login=${t_login} \
                         -Jt_entries=${t_entries} \
+                        -Jt_view=${t_view} \
                         -Jt_addtocart=${t_addtocart} \
                         -Jt_viewcart=${t_viewcart} \
-                        -Jt_view=${t_view} \
                         -Jt_deleteitem=${t_deleteitem} \
                         -Jmode=${params.MODE} \
                         -Jrampup=${params.RAMPUP} \
