@@ -2,9 +2,15 @@ pipeline {
     agent any
 
     parameters {
+        // Выбор сценария
+        choice(name: 'TARGET',
+               choices: ['e2e', 'home', 'login', 'entries', 'addtocart', 'viewcart', 'view', 'deleteitem'],
+               description: 'Что тестируем? e2e - весь сценарий, остальное - изоляция эндпоинтов')
+
         choice(name: 'MODE', choices: ['guest', 'mix'], description: 'Сценарий: только гость или 50/50')
         choice(name: 'LOAD_TYPE', choices: ['By Duration (по времени)', 'By Loops (по кругам)'], description: 'Как ограничиваем тест?')
-        string(name: 'THREADS', defaultValue: '1', description: 'Количество пользователей')
+
+        string(name: 'THREADS', defaultValue: '1', description: 'Количество пользователей для активного таргета')
         string(name: 'RAMPUP', defaultValue: '1', description: 'Разгон (сек)')
         string(name: 'DURATION_VAL', defaultValue: '60', description: 'Если выбрали "по времени" (сек)')
         string(name: 'LOOPS_VAL', defaultValue: '1', description: 'Если выбрали "по кругам" (количество повторов)')
@@ -38,9 +44,31 @@ pipeline {
         stage('Run Load Test') {
             steps {
                 script {
+                    // Инициализируем потоки всех групп нулями
+                    def t_e2e = 0
+                    def t_home = 0
+                    def t_login = 0
+                    def t_entries = 0
+                    def t_addtocart = 0
+                    def t_viewcart = 0
+                    def t_view = 0
+                    def t_deleteitem = 0
+
+                    // Присваиваем THREADS только выбранному таргету
+                    switch(params.TARGET) {
+                        case 'e2e': t_e2e = params.THREADS; break
+                        case 'home': t_home = params.THREADS; break
+                        case 'login': t_login = params.THREADS; break
+                        case 'entries': t_entries = params.THREADS; break
+                        case 'addtocart': t_addtocart = params.THREADS; break
+                        case 'viewcart': t_viewcart = params.THREADS; break
+                        case 'view': t_view = params.THREADS; break
+                        case 'deleteitem': t_deleteitem = params.THREADS; break
+                    }
+
+                    // Логика Loops vs Duration
                     def jm_loops = ""
                     def jm_duration = ""
-
                     if (params.LOAD_TYPE.contains('Duration')) {
                         echo "--- Режим: ТЕСТ ПО ВРЕМЕНИ (${params.DURATION_VAL} сек) ---"
                         jm_loops = "-1"
@@ -53,10 +81,18 @@ pipeline {
 
                     sh "rm -f ${RESULTS_FILE}"
 
+                    // Запуск с передачей всех специфичных переменных потоков
                     sh """
                         ${JM_BIN} -n -t ${JMX_FILE} -l ${RESULTS_FILE} \
+                        -Jt_e2e=${t_e2e} \
+                        -Jt_home=${t_home} \
+//                         -Jt_login=${t_login} \
+//                         -Jt_entries=${t_entries} \
+//                         -Jt_addtocart=${t_addtocart} \
+//                         -Jt_viewcart=${t_viewcart} \
+//                         -Jt_view=${t_view} \
+//                         -Jt_deleteitem=${t_deleteitem} \
                         -Jmode=${params.MODE} \
-                        -Jthreads=${params.THREADS} \
                         -Jrampup=${params.RAMPUP} \
                         -Jloops=${jm_loops} \
                         -Jduration=${jm_duration} \
@@ -68,11 +104,10 @@ pipeline {
 
         stage('Archive Results') {
             steps {
-                // archiveArtifacts работает напрямую в steps, script тут не обязателен
                 archiveArtifacts artifacts: "${RESULTS_FILE}", fingerprint: true, allowEmptyArchive: true
             }
         }
-    } // Конец stages
+    }
 
     post {
         always {
