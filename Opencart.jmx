@@ -509,7 +509,7 @@
         <hashTree/>
       </hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="TG_Home_Page">
-        <stringProp name="ThreadGroup.num_threads">${__P(threads_home, 0)}</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${__P(t_home, 0)}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">${__P(rampup, 1)}</stringProp>
         <stringProp name="ThreadGroup.duration">${__P(duration, 60)}</stringProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
