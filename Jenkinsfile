@@ -86,12 +86,12 @@ pipeline {
                         ${JM_BIN} -n -t ${JMX_FILE} -l ${RESULTS_FILE} \
                         -Jt_e2e=${t_e2e} \
                         -Jt_home=${t_home} \
-//                         -Jt_login=${t_login} \
-//                         -Jt_entries=${t_entries} \
-//                         -Jt_addtocart=${t_addtocart} \
-//                         -Jt_viewcart=${t_viewcart} \
-//                         -Jt_view=${t_view} \
-//                         -Jt_deleteitem=${t_deleteitem} \
+                        -Jt_login=${t_login} \
+                        -Jt_entries=${t_entries} \
+                        -Jt_addtocart=${t_addtocart} \
+                        -Jt_viewcart=${t_viewcart} \
+                        -Jt_view=${t_view} \
+                        -Jt_deleteitem=${t_deleteitem} \
                         -Jmode=${params.MODE} \
                         -Jrampup=${params.RAMPUP} \
                         -Jloops=${jm_loops} \
